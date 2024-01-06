@@ -6,7 +6,7 @@ WORKDIR /app
 
 # 复制 go.mod 和 go.sum 文件并下载依赖
 COPY go.mod go.sum ./
-RUN go mod download
+RUN export GO111MODULE=on && export GOPROXY=https://goproxy.cn &&  go mod download
 
 # 复制应用程序源代码
 COPY . .
@@ -17,7 +17,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
 # 创建最终的镜像
 #FROM alpine:latest
 FROM golang:1.22rc1
-RUN apk --no-cache add ca-certificates
+#RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 COPY --from=builder /app/app .
 
