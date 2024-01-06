@@ -1,5 +1,5 @@
 # 设置基础镜像
-FROM 1.22rc1-alpine3.19 AS builder
+FROM golang:1.22rc1-alpine3.19 AS builder
 
 # 设置工作目录
 WORKDIR /app
