@@ -12,6 +12,7 @@ import (
 func main() {
 	r := gin.Default()
 
+	// test
 	r.POST("/grafana-feishu-webhook", func(c *gin.Context) {
 		body := PrintAndParseOriginJSON("grafana-feishu-webhook", c)
 
