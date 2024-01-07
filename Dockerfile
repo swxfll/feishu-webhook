@@ -1,5 +1,5 @@
 # 设置基础镜像
-FROM golang:1.22rc1-alpine3.19 AS builder
+FROM registry.cn-hangzhou.aliyuncs.com/app_ll/golang:1.22rc1-alpine3.19 AS builder
 
 # 设置工作目录
 WORKDIR /app
@@ -16,7 +16,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o app .
 
 # 创建最终的镜像
 #FROM alpine:latest
-FROM golang:1.22rc1
+FROM registry.cn-hangzhou.aliyuncs.com/app_ll/golang:1.22rc1
 #RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 COPY --from=builder /app/app .
