@@ -72,10 +72,10 @@ func main() {
 
 	})
 
-	r.POST("/Hello World", func(c *gin.Context) {
+	r.GET("/hello", func(c *gin.Context) {
 
 		c.JSON(200, gin.H{
-			"SendMessage": "Hello World",
+			"SendMessage": "Hello World2",
 		})
 
 	})
