@@ -41,7 +41,7 @@ func main() {
 
 		var alert AlterManager
 		if err := json.Unmarshal(body, &alert); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse JSON"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse JSON" + err.Error()})
 			return
 		}
 
@@ -49,13 +49,14 @@ func main() {
 		var details string
 		for _, item := range alert.Alerts {
 			index++
-			label := fmt.Sprintf("标签: \nalertname: %s\ninstance: %s\njob: %s\nseverity: %s\n\n",
+
+			annotations := fmt.Sprintf("⚠告警值: %s\n\nℹ︎︎注解: \ndescription: %s\nsummary: %s\n\n",
+				item.Annotations.Value, item.Annotations.Description, item.Annotations.Summary)
+
+			label := fmt.Sprintf("🏷标签: \nalertname: %s\ninstance: %s\njob: %s\nseverity: %s\n\n",
 				item.Labels.Alertname, item.Labels.Instance, item.Labels.Job, item.Labels.Severity)
 
-			annotations := fmt.Sprintf("注解: \ndescription: %s\nsummary: %s\n\n",
-				item.Annotations.Description, item.Annotations.Summary)
-
-			details += fmt.Sprintf("====%d====\n", index) + label + annotations
+			details += fmt.Sprintf("====%d====\n", index) + annotations + label
 
 		}
 

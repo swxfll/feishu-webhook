@@ -22,6 +22,7 @@ type AlterManager struct {
 		Annotations struct {
 			Description string `json:"description"`
 			Summary     string `json:"summary"`
+			Value       string `json:"value"`
 		} `json:"annotations"`
 		StartsAt     time.Time `json:"startsAt"`
 		EndsAt       time.Time `json:"endsAt"`
