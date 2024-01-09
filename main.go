@@ -40,34 +40,34 @@ func main() {
 	r.POST("/alertmanager-feishu-webhook", func(c *gin.Context) {
 		body := PrintAndParseOriginJSON("alertmanager-feishu-webhook", c)
 
-		var alert AlterManager
-		if err := json.Unmarshal(body, &alert); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse JSON" + err.Error()})
-			return
-		}
+		//var alert AlterManager
+		//if err := json.Unmarshal(body, &alert); err != nil {
+		//	c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse JSON" + err.Error()})
+		//	return
+		//}
 
-		index := 0
-		var details string
-		for _, item := range alert.Alerts {
-			index++
-
-			annotations := fmt.Sprintf("⚠告警值: %s\n\nℹ︎︎注解: \ndescription: %s\nsummary: %s\n\n",
-				item.Annotations.Value, item.Annotations.Description, item.Annotations.Summary)
-
-			label := fmt.Sprintf("🏷标签: \nalertname: %s\ninstance: %s\njob: %s\nseverity: %s\n\n",
-				item.Labels.Alertname, item.Labels.Instance, item.Labels.Job, item.Labels.Severity)
-
-			details += fmt.Sprintf("====%d====\n", index) + annotations + label
-
-		}
-
-		msg := fmt.Sprintf("receiver: %s\nstatus: %s\ngroupLabels: %s\ncommonLabels: %s\n详情(%d 条告警):\n%s",
-			alert.Receiver,
-			alert.Status, alert.GroupLabels, alert.CommonLabels,
-			index, details)
+		//index := 0
+		//var details string
+		//for _, item := range alert.Alerts {
+		//	index++
+		//
+		//	annotations := fmt.Sprintf("⚠告警值: %s\n\nℹ︎︎注解: \ndescription: %s\nsummary: %s\n\n",
+		//		item.Annotations.Value, item.Annotations.Description, item.Annotations.Summary)
+		//
+		//	label := fmt.Sprintf("🏷标签: \nalertname: %s\ninstance: %s\njob: %s\nseverity: %s\n\n",
+		//		item.Labels.Alertname, item.Labels.Instance, item.Labels.Job, item.Labels.Severity)
+		//
+		//	details += fmt.Sprintf("====%d====\n", index) + annotations + label
+		//
+		//}
+		//
+		//msg := fmt.Sprintf("receiver: %s\nstatus: %s\ngroupLabels: %s\ncommonLabels: %s\n详情(%d 条告警):\n%s",
+		//	alert.Receiver,
+		//	alert.Status, alert.GroupLabels, alert.CommonLabels,
+		//	index, details)
 
 		c.JSON(200, gin.H{
-			"SendMessage": SendMessage(msg),
+			"SendMessage": SendMessage(string(body)),
 		})
 
 	})
