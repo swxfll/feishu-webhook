@@ -10,6 +10,8 @@ import (
 	"time"
 )
 
+var lastSentTime time.Time = time.Now()
+
 func main() {
 	r := gin.Default()
 
@@ -74,9 +76,12 @@ func main() {
 		//	alert.Status, alert.GroupLabels, alert.CommonLabels,
 		//	index, details)
 
+		now := time.Now()
+		duration := now.Sub(lastSentTime)
 		c.JSON(200, gin.H{
-			"SendMessage": SendMessage(string(jsonStr) + "\n" + time.Now().String()),
+			"SendMessage": SendMessage(string(jsonStr) + "\n" + time.Now().String() + "\n距上一次发送间隔:" + duration.String()),
 		})
+		lastSentTime = now
 
 	})
 
