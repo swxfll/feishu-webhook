@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"io/ioutil"
 	"net/http"
+	"time"
 )
 
 func main() {
@@ -74,7 +75,7 @@ func main() {
 		//	index, details)
 
 		c.JSON(200, gin.H{
-			"SendMessage": SendMessage(string(jsonStr)),
+			"SendMessage": SendMessage(string(jsonStr) + "\n" + time.Now().String()),
 		})
 
 	})
