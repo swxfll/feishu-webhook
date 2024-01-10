@@ -40,11 +40,18 @@ func main() {
 	r.POST("/alertmanager-feishu-webhook", func(c *gin.Context) {
 		body := PrintAndParseOriginJSON("alertmanager-feishu-webhook", c)
 
-		//var alert AlterManager
-		//if err := json.Unmarshal(body, &alert); err != nil {
-		//	c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse JSON" + err.Error()})
-		//	return
-		//}
+		var alert AlterManager
+		if err := json.Unmarshal(body, &alert); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse JSON" + err.Error()})
+			return
+		}
+
+		// 将数据转换为格式化的JSON字符串
+		jsonStr, err := json.MarshalIndent(alert, "", "  ")
+		if err != nil {
+			fmt.Println("JSON formatting error:", err)
+			return
+		}
 
 		//index := 0
 		//var details string
@@ -67,7 +74,7 @@ func main() {
 		//	index, details)
 
 		c.JSON(200, gin.H{
-			"SendMessage": SendMessage(string(body)),
+			"SendMessage": SendMessage(string(jsonStr)),
 		})
 
 	})
