@@ -94,7 +94,7 @@ func main() {
 
 	})
 
-	r.POST("/alertmanager-feishu-webhook-db'", func(c *gin.Context) {
+	r.POST("/alertmanager-feishu-webhook-db", func(c *gin.Context) {
 		body := PrintAndParseOriginJSON("alertmanager-feishu-webhook-db", c)
 
 		var alert AlterManager
