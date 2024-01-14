@@ -10,7 +10,9 @@ import (
 	"time"
 )
 
-var lastSentTime time.Time = time.Now()
+var defaultLastSentTime time.Time = time.Now()
+var devopsLastSentTime time.Time = time.Now()
+var dbLastSentTime time.Time = time.Now()
 
 func main() {
 	r := gin.Default()
@@ -36,12 +38,12 @@ func main() {
 			grafana.Message)
 
 		c.JSON(200, gin.H{
-			"SendMessage": SendMessage(msg),
+			"SendMessage": SendMessage("", msg),
 		})
 	})
 
-	r.POST("/alertmanager-feishu-webhook", func(c *gin.Context) {
-		body := PrintAndParseOriginJSON("alertmanager-feishu-webhook", c)
+	r.POST("/alertmanager-feishu-webhook-default", func(c *gin.Context) {
+		body := PrintAndParseOriginJSON("alertmanager-feishu-webhook-default", c)
 
 		var alert AlterManager
 		if err := json.Unmarshal(body, &alert); err != nil {
@@ -56,32 +58,65 @@ func main() {
 			return
 		}
 
-		//index := 0
-		//var details string
-		//for _, item := range alert.Alerts {
-		//	index++
-		//
-		//	annotations := fmt.Sprintf("⚠告警值: %s\n\nℹ︎︎注解: \ndescription: %s\nsummary: %s\n\n",
-		//		item.Annotations.Value, item.Annotations.Description, item.Annotations.Summary)
-		//
-		//	label := fmt.Sprintf("🏷标签: \nalertname: %s\ninstance: %s\njob: %s\nseverity: %s\n\n",
-		//		item.Labels.Alertname, item.Labels.Instance, item.Labels.Job, item.Labels.Severity)
-		//
-		//	details += fmt.Sprintf("====%d====\n", index) + annotations + label
-		//
-		//}
-		//
-		//msg := fmt.Sprintf("receiver: %s\nstatus: %s\ngroupLabels: %s\ncommonLabels: %s\n详情(%d 条告警):\n%s",
-		//	alert.Receiver,
-		//	alert.Status, alert.GroupLabels, alert.CommonLabels,
-		//	index, details)
+		now := time.Now()
+		duration := now.Sub(defaultLastSentTime)
+		c.JSON(200, gin.H{
+			"SendMessage": SendMessage("https://open.feishu.cn/open-apis/bot/v2/hook/9f53885e-2225-4e9e-95de-e8616c2ef7bd",
+				string(jsonStr)+"\n"+time.Now().String()+"\n距上一次发送间隔:"+duration.String()),
+		})
+		defaultLastSentTime = now
+
+	})
+
+	r.POST("/alertmanager-feishu-webhook-devops", func(c *gin.Context) {
+		body := PrintAndParseOriginJSON("alertmanager-feishu-webhook-devops", c)
+
+		var alert AlterManager
+		if err := json.Unmarshal(body, &alert); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse JSON" + err.Error()})
+			return
+		}
+
+		// 将数据转换为格式化的JSON字符串
+		jsonStr, err := json.MarshalIndent(alert, "", "  ")
+		if err != nil {
+			fmt.Println("JSON formatting error:", err)
+			return
+		}
 
 		now := time.Now()
-		duration := now.Sub(lastSentTime)
+		duration := now.Sub(devopsLastSentTime)
 		c.JSON(200, gin.H{
-			"SendMessage": SendMessage(string(jsonStr) + "\n" + time.Now().String() + "\n距上一次发送间隔:" + duration.String()),
+			"SendMessage": SendMessage("https://open.feishu.cn/open-apis/bot/v2/hook/65c903f4-1283-4725-9ecb-2ad9fd2fd48c",
+				string(jsonStr)+"\n"+time.Now().String()+"\n距上一次发送间隔:"+duration.String()),
 		})
-		lastSentTime = now
+		devopsLastSentTime = now
+
+	})
+
+	r.POST("/alertmanager-feishu-webhook-db'", func(c *gin.Context) {
+		body := PrintAndParseOriginJSON("alertmanager-feishu-webhook-db", c)
+
+		var alert AlterManager
+		if err := json.Unmarshal(body, &alert); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Failed to parse JSON" + err.Error()})
+			return
+		}
+
+		// 将数据转换为格式化的JSON字符串
+		jsonStr, err := json.MarshalIndent(alert, "", "  ")
+		if err != nil {
+			fmt.Println("JSON formatting error:", err)
+			return
+		}
+
+		now := time.Now()
+		duration := now.Sub(dbLastSentTime)
+		c.JSON(200, gin.H{
+			"SendMessage": SendMessage("https://open.feishu.cn/open-apis/bot/v2/hook/bece0a8d-a2ea-4228-8cfa-a437a007b87b",
+				string(jsonStr)+"\n"+time.Now().String()+"\n距上一次发送间隔:"+duration.String()),
+		})
+		dbLastSentTime = now
 
 	})
 
@@ -111,10 +146,7 @@ func PrintAndParseOriginJSON(route string, c *gin.Context) []byte {
 	return body
 }
 
-func SendMessage(msg string) string {
-	// 发送 POST 请求
-	url := "https://open.feishu.cn/open-apis/bot/v2/hook/9e44a9bf-8952-48ac-beb5-e11f77c25692"
-
+func SendMessage(url string, msg string) string {
 	payload := Payload{
 		MsgType: "text",
 		Content: struct {
